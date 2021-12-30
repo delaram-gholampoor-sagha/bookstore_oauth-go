@@ -13,8 +13,12 @@ import (
 
 	"github.com/Delaram-Gholampoor-Sagha/bookstore_utils-go/rest_errors"
 
+	//An extremely simple to use, lightweight, yet powerful REST Client
 	"github.com/mercadolibre/golang-restclient/rest"
 )
+
+// NOTE ABOUT mercadolibre package :
+// The Go http standard library is a great library, but it might sometimes be a bit too low level to use, and it doesn't offer features like fork-join requests for better performance, response caching based on headers, and the possibility to mockup responses.
 
 const (
 	headerXPublic   = "X-Public"
@@ -25,8 +29,13 @@ const (
 )
 
 var (
+	// RequestBuilder is the baseline for creating requests
+	// There's a Default Builder that you may use for simple requests
+	// RequestBuilder si thread-safe, and you should store it for later re-used.
 	oauthRestClient = rest.RequestBuilder{
+		// Base URL to be used for each Request. The final URL will be BaseURL + URL.
 		BaseURL: "http://localhost:8080",
+		// Complete request time out.
 		Timeout: 200 * time.Millisecond,
 	}
 )
@@ -99,6 +108,9 @@ func cleanRequest(request *http.Request) {
 }
 
 func getAccessToken(accessTokenId string) (*accessToken, rest_errors.RestErr) {
+	// In Restful, GET is used for "reading" or retrieving a resource.
+	// Client should expect a response status code of 200(OK) if resource exists,
+	// 404(Not Found) if it doesn't, or 400(Bad Request).
 	response := oauthRestClient.Get(fmt.Sprintf("/oauth/access_token/%s", accessTokenId))
 	if response == nil || response.Response == nil {
 		return nil, rest_errors.NewInternalServerError("invalid restclient response when trying to get access token",
